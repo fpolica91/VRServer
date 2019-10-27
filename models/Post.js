@@ -9,11 +9,11 @@ const postSchema = new Schema({
     type: String,
     required: true
   },
-  owner: String,
-  likes: [String]
-  // owner: {
-  //   type: Schema.Types.ObjectId, ref: "User"
-  // }
+  // owner: String,
+  likes: [String],
+  owner: {
+    type: Schema.Types.ObjectId, ref: "User"
+  }
 })
 
 const Post = mongoose.model('Post', postSchema);
