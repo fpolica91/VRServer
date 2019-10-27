@@ -75,13 +75,8 @@ router.post('/auth/login', (req, res, next) => {
   })(req, res, next);
 })
 
-router.delete('/auth/logout', (req, res, next) => {
-  req.logout();
-
-  res.json({userDoc: null})
-})
-
 router.get('/auth/loggedin', (req, res, next) => {
+  console.log(req)
   if(req.user){
     req.user.encryptedPassword = undefined;
 
@@ -90,5 +85,13 @@ router.get('/auth/loggedin', (req, res, next) => {
     res.status(401).json({userDoc: null})
   }
 })
+
+router.delete('/auth/logout', (req, res, next) => {
+  req.logout();
+   res.json({userDoc: null})
+
+})
+
+
 
 module.exports = router;
