@@ -12,7 +12,6 @@ const passport = require('passport');
 const uploader = require('../configs/cloudinary-setup');
 
 router.post('/auth/signup', uploader.single("imageUrl"), (req, res ,next) => {
-  console.log(req.body);
   const {username, email, password, imagePost} = req.body;
 
   if(username === "" || password === ""){
@@ -76,7 +75,6 @@ router.post('/auth/login', (req, res, next) => {
 })
 
 router.get('/auth/loggedin', (req, res, next) => {
-  console.log(req)
   if(req.user){
     req.user.encryptedPassword = undefined;
 
