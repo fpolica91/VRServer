@@ -9,8 +9,7 @@ const postSchema = new Schema({
     type: String,
     required: true
   },
-  // owner: String,
-  likes: [String],
+  likes: [{ type: Schema.Types.ObjectId, "ref": "User"}],
   owner: {
     type: Schema.Types.ObjectId, ref: "User"
   }

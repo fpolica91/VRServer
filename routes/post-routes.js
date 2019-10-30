@@ -1,7 +1,8 @@
 const express = require('express');
 const postroutes = express.Router();
 const Post = require('../models/Post');
-
+const mongoose = require('mongoose')
+mongoose.set('useFindAndModify', false);
 // include CLOUDINARY:
 const uploader = require('../configs/cloudinary-setup');
 
@@ -35,14 +36,53 @@ postroutes.get('/createNewPost', (req, res, next) => {
  }
  })
 
- postroutes.get('/post/:id', (req, res ,next) => {
-   const theId = req.params.id
-   Post.findById(theId).populate('owner')
-   .then(thePost => {
-     res.status(200).json(thePost)
-   })
-   .catch(err => res.json(err))
 
-  })
+
+ postroutes.post('/update/:id', (req, res, _) => {
+  //  console.log(req.params.id)
+   const theUser = req.body._id
+   const postId = req.params.id
+   Post.findById(postId)
+   .then(thePost => {
+    // console.log(req.body._id)
+    //  console.log(thePost);
+    //  console.log(thePost.likes.indexOf(theUser))
+     //CHECK IF THE USER IS ALREADY IN THE LIKE ARRAY
+     if(thePost.likes.indexOf(theUser) >= 0){
+       const theIndex = thePost.likes.indexOf(theUser)
+       thePost.likes.splice(theIndex, 1);
+       thePost.save((err)=>{
+        if(err){
+          res.json({success: false, message: "Something went wrong while Liking the post"})
+        }else{
+          res.json(thePost)
+        }
+      })
+// IF THE USER IS NOT IN THE ARRAY, WE PUSH THE USER TO THE ARRAY
+     }else{
+     thePost.likes.push(theUser);
+     thePost.save((err)=>{
+       if(err){
+         res.json({success: false, message: "Something went wrong while Liking the post"})
+       }else{
+         res.json(thePost)
+       }
+     })
+    }
+  //    res.json(thePost)
+  //  }).catch(err => {
+  //    res.json(err);
+   })
+ })
+
+//  postroutes.get('/post/:id', (req, res ,next) => {
+//    const theId = req.params.id
+//    Post.findById(theId).populate('owner')
+//    .then(thePost => {
+//      res.status(200).json(thePost)
+//    })
+//    .catch(err => res.json(err))
+
+//   })
 
 module.exports = postroutes
