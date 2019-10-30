@@ -40,6 +40,9 @@ postroutes.get('/createNewPost', (req, res, next) => {
 
  postroutes.post('/update/:id', (req, res, _) => {
   //  console.log(req.params.id)
+  if(req.body._id === undefined){
+    res.json({message: "WRONG!"})
+  }else{
    const theUser = req.body._id
    const postId = req.params.id
    Post.findById(postId)
@@ -69,10 +72,13 @@ postroutes.get('/createNewPost', (req, res, next) => {
        }
      })
     }
+    
   //    res.json(thePost)
   //  }).catch(err => {
   //    res.json(err);
+  
    })
+  }
  })
 
 //  postroutes.get('/post/:id', (req, res ,next) => {
