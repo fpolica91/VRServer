@@ -87,7 +87,13 @@ postroutes.get('/createNewPost', (req, res, next) => {
   }
  })
 
-//  postroutes.post()
+ postroutes.post('/delete/:id', (req, res, next) => {
+   const postId = req.params.id
+   console.log(postId)
+   Post.findByIdAndDelete(postId)
+   .then(postToDelete => console.log(postToDelete))
+   .catch(err => console.log(err))
+ })
 
 //  postroutes.get('/post/:id', (req, res ,next) => {
 //    const theId = req.params.id
