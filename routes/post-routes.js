@@ -3,6 +3,7 @@ const postroutes = express.Router();
 const Post = require('../models/Post');
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false);
+const User = require('../models/User')
 // include CLOUDINARY:
 const uploader = require('../configs/cloudinary-setup');
 
@@ -16,6 +17,14 @@ postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) 
     likes: []
   }).then(newPost => {
     console.log("NEW POST!", newPost)
+   // console.log(req.user)
+    // User.findById(req.user._id)
+    // .then(theUser => {
+    //   console.log(theUser)
+    //   theUser.posts.push(newPost)
+    //   theUser.save()
+    // })
+
     res.status(200).json(newPost)
   //  if(newPost){
   //   res.status(200).json({message: "New post made successfully!"});
@@ -47,9 +56,6 @@ postroutes.get('/createNewPost', (req, res, next) => {
    const postId = req.params.id
    Post.findById(postId)
    .then(thePost => {
-    // console.log(req.body._id)
-    //  console.log(thePost);
-    //  console.log(thePost.likes.indexOf(theUser))
      //CHECK IF THE USER IS ALREADY IN THE LIKE ARRAY
      if(thePost.likes.indexOf(theUser) >= 0){
        const theIndex = thePost.likes.indexOf(theUser)
@@ -80,6 +86,8 @@ postroutes.get('/createNewPost', (req, res, next) => {
    })
   }
  })
+
+//  postroutes.post()
 
 //  postroutes.get('/post/:id', (req, res ,next) => {
 //    const theId = req.params.id

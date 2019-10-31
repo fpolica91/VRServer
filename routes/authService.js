@@ -11,6 +11,20 @@ const passport = require('passport');
 // include CLOUDINARY:
 const uploader = require('../configs/cloudinary-setup');
 
+
+router.get('/users', (req, res ,next) => {
+  User.find()
+  .then(allUser => {
+  const protectUsers = []
+  for(let i = 0; i < allUser.length; i++){
+    allUser[i].encryptedPassword = null
+    protectUsers.push(allUser[i])
+  } 
+
+    res.json(protectUsers)
+  })
+})
+
 router.post('/auth/signup', uploader.single("imageUrl"), (req, res ,next) => {
   const {username, email, password, imagePost} = req.body;
 
