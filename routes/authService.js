@@ -133,8 +133,8 @@ router.post('/follow/:id', (req, res, next) => {
       userFollower.following.splice(userToUnfollowIndex, 1)
       userToFollow.followers.splice(userIndex, 1)
     }else{
-    userFollower.following.push(userToFollowId)
-    userToFollow.followers.push(userId)
+    userFollower.following.push({_id: userToFollowId, username: userToFollow.username, imageUrl: userToFollow.imageUrl})
+    userToFollow.followers.push({_id: userId, username: userFollower.username, imageUrl: userFollower.imageUrl})
   }
 
       theUsers[0].save((err) => {
