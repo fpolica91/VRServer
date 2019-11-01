@@ -11,20 +11,23 @@ const passport = require('passport');
 // include CLOUDINARY:
 const uploader = require('../configs/cloudinary-setup');
 
-
+//GET ALL USERS FROM DB
 router.get('/users', (req, res ,next) => {
   User.find()
   .then(allUser => {
   const protectUsers = []
   for(let i = 0; i < allUser.length; i++){
-    allUser[i].encryptedPassword = null
+    allUser[i].encryptedPassword = undefined
     protectUsers.push(allUser[i])
   } 
 
     res.json(protectUsers)
   })
 })
+// END OF GET ALL OF USERS FROM DB
 
+
+//SIGN UP ROUTE
 router.post('/auth/signup', uploader.single("imageUrl"), (req, res ,next) => {
   const {username, email, password, imagePost} = req.body;
 
@@ -66,7 +69,9 @@ return;
   })
   .catch(err => next(err));// close User.findOne()
 })
+//END OF SIGNUP ROUTE
 
+//LOGIN ROUTE
 router.post('/auth/login', (req, res, next) => {
   passport.authenticate('local', (err, userDoc, failureDetails) => {
     if(err){
@@ -87,7 +92,9 @@ router.post('/auth/login', (req, res, next) => {
     })
   })(req, res, next);
 })
+//END OF LOGIN ROUTE
 
+//LOGGED IN CHECK ROUTE
 router.get('/auth/loggedin', (req, res, next) => {
   if(req.user){
     req.user.encryptedPassword = undefined;
@@ -97,13 +104,123 @@ router.get('/auth/loggedin', (req, res, next) => {
     res.status(401).json({userDoc: null})
   }
 })
+//END OF LOGGED IN CHECK ROUTE
 
+//LOGOUT ROUTE
 router.delete('/auth/logout', (req, res, next) => {
   req.logout();
    res.json({userDoc: null})
 
 })
+//END OF LOGOUT ROUTE
 
+//FOLLOWING FUNCTIONALITY
+//ANOTHER VERSION (SHORTER)
+router.post('/follow/:id', (req, res, next) => {
+  const userId = req.body._id
+  const userToFollowId = req.params.id
+  const idArray = [userId, userToFollowId]
+  User.find({_id: {$in: idArray}})
+  .then(theUsers =>{
+    const userFollower = theUsers[0]
+    const userToFollow = theUsers[1]
+
+    console.log(userToFollow.followers.indexOf(userId))
+
+    if(userToFollow.followers.indexOf(userId) >= 0){
+      const userIndex = userToFollow.followers.indexOf(userId)
+      const userToUnfollowIndex = userFollower.following.indexOf(userToFollowId)
+      userFollower.following.splice(userToUnfollowIndex, 1)
+      userToFollow.followers.splice(userIndex, 1)
+    }else{
+    userFollower.following.push(userToFollowId)
+    userToFollow.followers.push(userId)
+  }
+
+      theUsers[0].save((err) => {
+        if(err){
+          res.json({message: "An error just happened while following/unfollowing"})
+        }else{
+          theUsers[1].save((err) => {
+            if(err){
+              res.json({message: "An error just happened while following/unfollowing"})
+            }else{
+              theUsers[0].encryptedPassword = undefined
+              theUsers[1].encryptedPassword = undefined
+            res.json(theUsers)
+            }
+          })
+        }
+      })
+
+
+  })
+  .catch(err => {
+    res.json(err)
+  })
+
+})
 
 
 module.exports = router;
+
+
+
+//VERSION F
+//FOLLOWING FUNCTIONALITY
+// router.post('/follow/:id', (req, res, _) => {
+//   const userToFollow = req.params.id
+//   const userFollowing = req.body._id
+  
+
+//   User.findById(userToFollow, (err, user) => {
+//     if(user.followers.some(follower => follower.equals(userFollowing))){
+//       const index = user.followers.indexOf(userFollowing)
+//       user.followers.splice(index, 1)
+//       user.save((err, __user) => {
+//         if(err){
+//           res.json({success: false, message: "unexpected error following/unfollowing"})
+//         }else{
+
+//           User.findById(userFollowing, (err, user) => {
+//             if(user.following.some(followed => followed.equals(userToFollow))){
+//               const index = user.following.indexOf(userToFollow)
+//               user.following.splice(index, 1)
+//               user.save((err, user) => {
+//                 if(err){
+//                   res.json({success: false, message: "unexpected error when following/unfollowing"})
+//                 }else{
+//                   res.json({
+//                     followers: __user.followers,
+//                     following: user.following
+//                   })
+//                 }
+//               })
+//             }
+//           })
+//         }
+//       })
+//     }else{
+//       user.followers.push(userFollowing)
+//       user.save((err, __user) => {
+//         if(err){
+//           res.json({success: false, message: "unexpected error when following/unfollowing"})
+//         }else{
+//           User.findById(userFollowing, (err, user) => {
+//             user.following.push(userToFollow)
+//             user.save((err, user) => {
+//               if(err){
+//                 res.json({success: false, message: "unexpected error when following/unfollowing"})
+//               }else{
+//                 res.json({
+//                   followers: __user.followers,
+//                   following: user.following
+//                 })
+//               }
+//             })
+//           })
+//         }
+//       })
+//     }
+//   })
+// })
