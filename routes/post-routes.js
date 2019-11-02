@@ -17,18 +17,7 @@ postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) 
     likes: []
   }).then(newPost => {
     console.log("NEW POST!", newPost)
-   // console.log(req.user)
-    // User.findById(req.user._id)
-    // .then(theUser => {
-    //   console.log(theUser)
-    //   theUser.posts.push(newPost)
-    //   theUser.save()
-    // })
-
     res.status(200).json(newPost)
-  //  if(newPost){
-  //   res.status(200).json({message: "New post made successfully!"});
-  //  }
   })
   .catch(err => console.log(err))
 })
@@ -37,7 +26,7 @@ postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) 
 
 postroutes.get('/createNewPost', (req, res, next) => {
   try{ 
-    Post.find().populate('owner')
+    Post.find().populate('owner', '_id imageUrl username')
    .then(theData => {res.status(200).json(theData)})
    .catch(err => next(err))
  }catch(err){
@@ -95,14 +84,5 @@ postroutes.get('/createNewPost', (req, res, next) => {
    .catch(err => console.log(err))
  })
 
-//  postroutes.get('/post/:id', (req, res ,next) => {
-//    const theId = req.params.id
-//    Post.findById(theId).populate('owner')
-//    .then(thePost => {
-//      res.status(200).json(thePost)
-//    })
-//    .catch(err => res.json(err))
-
-//   })
 
 module.exports = postroutes
