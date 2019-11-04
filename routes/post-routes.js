@@ -9,12 +9,15 @@ const uploader = require('../configs/cloudinary-setup');
 
 postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) => {
  // console.log(req.body)
-  const {caption, imagePost} = req.body
+  const {caption, imagePost, tags} = req.body
+  let tagsArray = tags.split(/[.,\/ -#]/)
+  let finalArray = tagsArray.filter(eachTag =>{ return eachTag !== "" })
   Post.create({
     caption,
     image: imagePost,
     owner: req.user,
-    likes: []
+    likes: [],
+    tags: finalArray
   }).then(newPost => {
     console.log("NEW POST!", newPost)
     res.status(200).json(newPost)
