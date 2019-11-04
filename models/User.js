@@ -17,10 +17,10 @@ const userSchema = new Schema({
     required: true
   },
   imageUrl: String,
+  bio: String,
   followers: [{ type: Schema.Types.ObjectId, ref: "User"}],
   following: [{ type: Schema.Types.ObjectId, ref: "User"}],
-  posts: [{ type: Schema.Types.ObjectId, ref: "Post"}],
-  bio: String
+  
 },
 {
   timestamps: true

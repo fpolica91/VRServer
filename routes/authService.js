@@ -54,7 +54,7 @@ return;
       imageUrl = imagePost
     }
 
-    User.create({username, email, encryptedPassword, imageUrl, bio: "Hello, I'm new here!"})
+    User.create({username, email, encryptedPassword, imageUrl, bio: "Hello, I'm new here!", followers: [], following: []})
     .then(userDoc => {
 
   // if all good, log in the user automatically
@@ -128,10 +128,15 @@ router.post('/follow/:id', (req, res, next) => {
   const idArray = [userId, userToFollowId]
   User.find({_id: {$in: idArray}})
   .then(theUsers =>{
-    const userFollower = theUsers[0]
-    const userToFollow = theUsers[1]
-
-    console.log(userToFollow.followers.indexOf(userId))
+    // console.log(theUsers)
+    let userFollower = theUsers[theUsers.findIndex(theUser => theUser.id === userId)]
+    let userToFollow = theUsers[theUsers.findIndex(theUser => theUser.id === userToFollowId)]
+    // console.log(theUsers.findIndex(theUser => theUser.id === userId))
+    // console.log("YOUR USER ")
+    // console.log(userFollower)
+    // console.log("OTHER USER ")
+    // console.log(userToFollow)
+    // console.log(userToFollow.followers.indexOf(userId))
 
     if(userToFollow.followers.indexOf(userId) >= 0){
       const userIndex = userToFollow.followers.indexOf(userId)
@@ -139,8 +144,8 @@ router.post('/follow/:id', (req, res, next) => {
       userFollower.following.splice(userToUnfollowIndex, 1)
       userToFollow.followers.splice(userIndex, 1)
     }else{
-    userFollower.following.push({_id: userToFollowId, username: userToFollow.username, imageUrl: userToFollow.imageUrl})
-    userToFollow.followers.push({_id: userId, username: userFollower.username, imageUrl: userFollower.imageUrl})
+    userFollower.following.push({_id: userToFollow._id, username: userToFollow.username, imageUrl: userToFollow.imageUrl})
+    userToFollow.followers.push({_id: userFollower._id, username: userFollower.username, imageUrl: userFollower.imageUrl})
   }
 
       theUsers[0].save((err) => {
