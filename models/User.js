@@ -19,7 +19,8 @@ const userSchema = new Schema({
   imageUrl: String,
   followers: [{ type: Schema.Types.ObjectId, ref: "User"}],
   following: [{ type: Schema.Types.ObjectId, ref: "User"}],
-  posts: [{ type: Schema.Types.ObjectId, ref: "Post"}]
+  posts: [{ type: Schema.Types.ObjectId, ref: "Post"}],
+  bio: String
 },
 {
   timestamps: true

@@ -13,15 +13,15 @@ const uploader = require('../configs/cloudinary-setup');
 
 //GET ALL USERS FROM DB
 router.get('/users', (req, res ,next) => {
-  User.find()
+  User.find().select('username imageUrl followers following bio')
   .then(allUser => {
-  const protectUsers = []
-  for(let i = 0; i < allUser.length; i++){
-    allUser[i].encryptedPassword = undefined
-    protectUsers.push(allUser[i])
-  } 
+  // const protectUsers = []
+  // for(let i = 0; i < allUser.length; i++){
+  //   allUser[i].encryptedPassword = undefined
+  //   protectUsers.push(allUser[i])
+  // } 
 
-    res.json(protectUsers)
+    res.json(allUser)
   })
 })
 // END OF GET ALL OF USERS FROM DB
@@ -29,7 +29,7 @@ router.get('/users', (req, res ,next) => {
 
 //SIGN UP ROUTE
 router.post('/auth/signup', uploader.single("imageUrl"), (req, res ,next) => {
-  const {username, email, password, imagePost} = req.body;
+  const {username, email, password, imagePost, profileImgDefault} = req.body;
 
   if(username === "" || password === ""){
 res.status(401).json({message: "All field need to be filled and password must contain a number!"})
@@ -46,9 +46,15 @@ return;
     const bcryptsalt = 10;
     const salt = bcrypt.genSaltSync(bcryptsalt);
     const encryptedPassword = bcrypt.hashSync(password, salt);
-    const imageUrl = imagePost
+    let imageUrl = ''
+    
+    if(imagePost === ""){
+      imageUrl = profileImgDefault
+    }else{
+      imageUrl = imagePost
+    }
 
-    User.create({username, email, encryptedPassword, imageUrl})
+    User.create({username, email, encryptedPassword, imageUrl, bio: "Hello, I'm new here!"})
     .then(userDoc => {
 
   // if all good, log in the user automatically
