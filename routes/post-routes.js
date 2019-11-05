@@ -39,7 +39,7 @@ postroutes.get('/createNewPost', (req, res, next) => {
 
 
 
- postroutes.post('/update/:id', (req, res, _) => {
+ postroutes.post('/updateLikes/:id', (req, res, _) => {
   //  console.log(req.params.id)
   if(req.body._id === undefined){
     res.json({message: "WRONG!"})
@@ -79,6 +79,45 @@ postroutes.get('/createNewPost', (req, res, next) => {
   }
  })
 
+ //EDIT POST ROUTE
+ postroutes.put('/updatePost/:id', async (req, res, _) => {
+   const { id } = req.params
+   const {caption, tags} = req.body
+   let tagsArray = []
+   let finalArray = []
+   if(typeof tags === 'object'){
+    finalArray = tags
+   }else{
+    tagsArray = tags.split(/[.,\/ -#]/)
+    finalArray = tagsArray.filter(eachTag =>{ return eachTag !== "" })
+}
+   if(!id){
+     res.json({success: false ,message: "cannot find post to edit"})
+   }else{
+     try{
+       await Post.findOneAndUpdate({_id: id}, {
+         caption: caption,
+         tags: finalArray
+       })
+       .then(post => {
+         res.json({
+           tags: post.tags,
+           caption: post.caption
+         })
+       })
+       .catch(err => {
+         if(err){
+           res.json(err)
+         }
+       })
+     }catch(err){
+       console.log(err)
+     }
+  }
+ })
+
+
+ //DELETE POST ROUTE
  postroutes.post('/delete/:id', (req, res, next) => {
    const postId = req.params.id
    console.log(postId)

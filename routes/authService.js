@@ -128,15 +128,8 @@ router.post('/follow/:id', (req, res, next) => {
   const idArray = [userId, userToFollowId]
   User.find({_id: {$in: idArray}})
   .then(theUsers =>{
-    // console.log(theUsers)
     let userFollower = theUsers[theUsers.findIndex(theUser => theUser.id === userId)]
     let userToFollow = theUsers[theUsers.findIndex(theUser => theUser.id === userToFollowId)]
-    // console.log(theUsers.findIndex(theUser => theUser.id === userId))
-    // console.log("YOUR USER ")
-    // console.log(userFollower)
-    // console.log("OTHER USER ")
-    // console.log(userToFollow)
-    // console.log(userToFollow.followers.indexOf(userId))
 
     if(userToFollow.followers.indexOf(userId) >= 0){
       const userIndex = userToFollow.followers.indexOf(userId)
