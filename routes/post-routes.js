@@ -38,7 +38,7 @@ postroutes.get('/createNewPost', (req, res, next) => {
  })
 
 
-
+//UPDATE LIKES ROUTE
  postroutes.post('/updateLikes/:id', (req, res, _) => {
   //  console.log(req.params.id)
   if(req.body._id === undefined){

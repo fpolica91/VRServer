@@ -165,6 +165,42 @@ router.post('/follow/:id', (req, res, next) => {
 
 })
 
+//UPDATE USER PROFILE
+router.put('/auth/updateUser/:id', uploader.single("imageUrl"), async(req, res, next) => {
+  console.log(req.params.id)
+  const { id } = req.params.id
+  console.log(req.body)
+  let {bio, imageFile, currentUser} = req.body
+  console.log(typeof imageFile)
+  // if(!id){
+  //   res.json({success: false ,message: "cannot find user to edit"})
+  // }else{
+
+    if(typeof imageFile !== 'string'){
+      imageFile = currentUser.imageUrl
+    }
+    try{
+      await User.findOneAndUpdate({id: id}, {
+        bio: bio,
+        imageUrl: imageFile
+      })
+      .then(user => {
+        res.json({
+          bio: user.bio,
+          imageUrl: user.imageUrl
+        })
+      })
+      .catch(err => {
+        if(err){
+          res.json(err)
+        }
+      })
+    }catch(err){
+      console.log(err)
+    }
+ //}
+})
+
 
 module.exports = router;
 
