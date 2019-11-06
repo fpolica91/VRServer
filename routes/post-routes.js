@@ -17,7 +17,8 @@ postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) 
     image: imagePost,
     owner: req.user,
     likes: [],
-    tags: finalArray
+    tags: finalArray,
+    comments: []
   }).then(newPost => {
     console.log("NEW POST!", newPost)
     res.status(200).json(newPost)
