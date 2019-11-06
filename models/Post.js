@@ -22,7 +22,8 @@ const postSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId, ref: "User"
   },
-  tags: [String]
+  tags: [String],
+  comments: [Comment]
 },
 {
   timestamps: true
