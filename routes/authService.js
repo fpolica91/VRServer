@@ -168,7 +168,7 @@ router.post('/follow/:id', (req, res, next) => {
 //UPDATE USER PROFILE
 router.put('/auth/updateUser/:id', uploader.single("imageUrl"), async(req, res, next) => {
   console.log(req.params.id)
-  const { id } = req.params.id
+  const { id } = req.params
   console.log(req.body)
   let {bio, imageFile, currentUser} = req.body
   console.log(typeof imageFile)
@@ -179,12 +179,14 @@ router.put('/auth/updateUser/:id', uploader.single("imageUrl"), async(req, res, 
     if(typeof imageFile !== 'string'){
       imageFile = currentUser.imageUrl
     }
+
     try{
-      await User.findOneAndUpdate({id: id}, {
+      await User.findOneAndUpdate({_id: id}, {
         bio: bio,
         imageUrl: imageFile
       })
       .then(user => {
+        console.log(user)
         res.json({
           bio: user.bio,
           imageUrl: user.imageUrl
