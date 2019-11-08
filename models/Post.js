@@ -10,6 +10,8 @@ const Comment = new Schema({
   timestamps: true
 })
 
+
+
 const postSchema = new Schema({
   caption: {
     type: String,

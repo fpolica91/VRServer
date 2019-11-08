@@ -30,7 +30,7 @@ postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) 
 
 postroutes.get('/createNewPost', (req, res, next) => {
   try{ 
-    Post.find().populate('owner', '_id imageUrl username').populate('likes', '_id imageUrl username')
+    Post.find().populate('owner', '_id imageUrl username').populate('likes', '_id imageUrl username').populate('comments.user', '_id imageUrl username')
    .then(theData => {res.status(200).json(theData)})
    .catch(err => next(err))
  }catch(err){
@@ -127,6 +127,33 @@ postroutes.get('/createNewPost', (req, res, next) => {
    .then(postToDelete => console.log(postToDelete))
    .catch(err => console.log(err))
  })
+
+
+ //COMMENTS ROUTE
+ postroutes.put('/addComment/:id', (req, res, next) => {
+console.log(req.params.id)
+console.log(req.body)
+const { id } = req.params  
+const { message, owner} = req.body
+
+try{
+  Post.findByIdAndUpdate(id, {
+    $push: {
+      comments: {
+        user: owner._id,
+        comment: message
+      }
+    }
+  } )
+  .then(newComment => {
+    res.json(newComment)
+  }).catch(err => console.log(err))
+
+}catch (err){
+throw err
+}
+
+ }) 
 
 
 module.exports = postroutes
