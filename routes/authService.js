@@ -18,9 +18,9 @@ const uploader = require('../configs/cloudinary-setup');
 router.get('/getNotifications/:id', (req, res, next) => {
   console.log(req.params.id)
   const {id} = req.params
-  Notifications.find({toWho: id})
+  Notifications.find({toWho: id}).populate('fromWho', '_id username imageUrl').populate('toWho', '_id username imageUrl')
   .then(theNotifications => {
-    console.log(theNotifications)
+    res.status(200).json(theNotifications)
   }).catch(err => console.log(err))
 })
 
