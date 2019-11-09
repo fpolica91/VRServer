@@ -71,9 +71,11 @@ postroutes.get('/createNewPost', (req, res, next) => {
 
 //WE SEND THE NOTIFICATION TO THE POST OWNER
      const notification = new Notifications({
+        type: "Like",
         event: "Liked your post",
         toWho: thePost.owner,
         fromWho: theUser._id,
+        relatedTo: thePost._id,
         seen: false
        })
        notification.save()

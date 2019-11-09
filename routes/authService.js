@@ -8,8 +8,21 @@ const bcrypt = require('bcryptjs');
 
 const passport = require('passport');
 
+const Notifications = require('../models/Notification')
+
 // include CLOUDINARY:
 const uploader = require('../configs/cloudinary-setup');
+
+
+//GET ALL NOTIFICATIONS FROM DB
+router.get('/getNotifications/:id', (req, res, next) => {
+  console.log(req.params.id)
+  const {id} = req.params
+  Notifications.find({toWho: id})
+  .then(theNotifications => {
+    console.log(theNotifications)
+  }).catch(err => console.log(err))
+})
 
 //GET ALL USERS FROM DB
 router.get('/users', (req, res ,next) => {
@@ -126,6 +139,16 @@ router.post('/follow/:id', (req, res, next) => {
   const userId = req.body._id
   const userToFollowId = req.params.id
   const idArray = [userId, userToFollowId]
+
+  const notification = new Notifications({
+    type: "Follow",
+    event: "Started following you",
+    toWho: userToFollowId,
+    fromWho: userId,
+    relatedTo: userId,
+    seen: false
+   })
+
   User.find({_id: {$in: idArray}})
   .then(theUsers =>{
     let userFollower = theUsers[theUsers.findIndex(theUser => theUser.id === userId)]
@@ -137,8 +160,10 @@ router.post('/follow/:id', (req, res, next) => {
       userFollower.following.splice(userToUnfollowIndex, 1)
       userToFollow.followers.splice(userIndex, 1)
     }else{
+
     userFollower.following.push({_id: userToFollow._id, username: userToFollow.username, imageUrl: userToFollow.imageUrl})
     userToFollow.followers.push({_id: userFollower._id, username: userFollower.username, imageUrl: userFollower.imageUrl})
+    notification.save()
   }
 
       theUsers[0].save((err) => {
@@ -151,7 +176,8 @@ router.post('/follow/:id', (req, res, next) => {
             }else{
               theUsers[0].encryptedPassword = undefined
               theUsers[1].encryptedPassword = undefined
-            res.json(theUsers)
+              const theInfo = {theUsers: theUsers, notification: notification}
+            res.json(theInfo)
             }
           })
         }
