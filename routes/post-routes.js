@@ -3,7 +3,8 @@ const postroutes = express.Router();
 const Post = require('../models/Post');
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false);
-const User = require('../models/User')
+const User = require('../models/User');
+const Notifications = require('../models/Notification'); 
 // include CLOUDINARY:
 const uploader = require('../configs/cloudinary-setup');
 
@@ -47,11 +48,12 @@ postroutes.get('/createNewPost', (req, res, next) => {
   }else{
    const theUserId = req.body._id
    const postId = req.params.id
-   Post.findById(postId).populate('likes', '_id imageUrl username')
+   Post.findById(postId).populate('likes', '_id imageUrl username').populate('comments.user', '_id imageUrl username')
    .then(thePost => {
      User.findById(theUserId).select('_id imageUrl username')
      .then(theUser => {
        console.log(theUser._id)
+       console.log(thePost.owner)
    //CHECK IF THE USER IS ALREADY IN THE LIKE ARRAY
    console.log(thePost.likes.findIndex(userToFind => userToFind.id === theUser.id));
       const theIndex = thePost.likes.findIndex(userToFind => userToFind.id === theUser.id)
@@ -61,17 +63,33 @@ postroutes.get('/createNewPost', (req, res, next) => {
          if(err){
            res.json({success: false, message: "Something went wrong while Liking the post"})
          }else{
-           res.json(thePost)
+           res.json({thePost: thePost})
          }
        })
  // IF THE USER IS NOT IN THE ARRAY, WE PUSH THE USER TO THE ARRAY
       }else{
+
+//WE SEND THE NOTIFICATION TO THE POST OWNER
+     const notification = new Notifications({
+        event: "Liked your post",
+        toWho: thePost.owner,
+        fromWho: theUser._id,
+        seen: false
+       })
+       notification.save()
+
+
       thePost.likes.push(theUser);
       thePost.save((err)=>{
         if(err){
           res.json({success: false, message: "Something went wrong while Liking the post"})
         }else{
-          res.json(thePost)
+          const theUpdatedPost = 
+          {
+            thePost: thePost,
+            notification: notification
+          }
+          res.json(theUpdatedPost)
         }
      })
 
@@ -100,7 +118,7 @@ postroutes.get('/createNewPost', (req, res, next) => {
        await Post.findOneAndUpdate({_id: id}, {
          caption: caption,
          tags: finalArray
-       })
+       }).populate('likes', '_id imageUrl username').populate('comments.user', '_id imageUrl username')
        .then(post => {
          res.json({
            tags: post.tags,
