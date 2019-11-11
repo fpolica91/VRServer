@@ -52,8 +52,8 @@ postroutes.get('/createNewPost', (req, res, next) => {
    .then(thePost => {
      User.findById(theUserId).select('_id imageUrl username')
      .then(theUser => {
-       console.log(theUser._id)
-       console.log(thePost.owner)
+      //  console.log(theUser._id)
+      //  console.log(thePost.owner)
    //CHECK IF THE USER IS ALREADY IN THE LIKE ARRAY
    console.log(thePost.likes.findIndex(userToFind => userToFind.id === theUser.id));
       const theIndex = thePost.likes.findIndex(userToFind => userToFind.id === theUser.id)
@@ -63,22 +63,30 @@ postroutes.get('/createNewPost', (req, res, next) => {
          if(err){
            res.json({success: false, message: "Something went wrong while Liking the post"})
          }else{
-           res.json({thePost: thePost})
+           res.json(thePost)
          }
        })
  // IF THE USER IS NOT IN THE ARRAY, WE PUSH THE USER TO THE ARRAY
       }else{
-
+        console.log(theUserId)
+       console.log(thePost.owner)
+        console.log(thePost.owner.equals(theUserId)) 
 //WE SEND THE NOTIFICATION TO THE POST OWNER
+
+     if(!thePost.owner.equals(theUserId)){
+       console.log("IT NOT THE SAME")     
      const notification = new Notifications({
-        type: "Like",
-        event: "Liked your post",
-        toWho: thePost.owner,
-        fromWho: theUser._id,
-        imageTo: postId,
-        seen: false
-       })
-       notification.save()
+      type: "Like",
+      event: "Liked your post",
+      toWho: thePost.owner,
+      fromWho: theUser._id,
+      imageTo: postId,
+      seen: false
+     })
+
+        notification.save()
+       }
+      
 
 
       thePost.likes.push(theUser);
@@ -86,12 +94,7 @@ postroutes.get('/createNewPost', (req, res, next) => {
         if(err){
           res.json({success: false, message: "Something went wrong while Liking the post"})
         }else{
-          const theUpdatedPost = 
-          {
-            thePost: thePost,
-            notification: notification
-          }
-          res.json(theUpdatedPost)
+          res.json(thePost)
         }
      })
 
@@ -166,18 +169,19 @@ try{
     }
   } )
   .then(postUpdated => {
-
-    const notification = new Notifications({
-      type: "Comment",
-      event: "commented your post",
-      toWho: postUpdated.owner,
-      fromWho: owner._id,
-      imageTo: id,
-      seen: false
-     })
-     notification.save()
+     if(!postUpdated.owner.equals(owner._id)){
+      const notification = new Notifications({
+        type: "Comment",
+        event: "commented your post",
+        toWho: postUpdated.owner,
+        fromWho: owner._id,
+        imageTo: id,
+        seen: false
+       })
+      notification.save()
+     }
      
-    res.json(newComment)
+    res.json(postUpdated)
   }).catch(err => console.log(err))
 
 }catch (err){

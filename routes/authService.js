@@ -176,8 +176,7 @@ router.post('/follow/:id', (req, res, next) => {
             }else{
               theUsers[0].encryptedPassword = undefined
               theUsers[1].encryptedPassword = undefined
-              const theInfo = {theUsers: theUsers, notification: notification}
-            res.json(theInfo)
+            res.json(theUsers)
             }
           })
         }
