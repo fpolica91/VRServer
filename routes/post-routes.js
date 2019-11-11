@@ -75,7 +75,7 @@ postroutes.get('/createNewPost', (req, res, next) => {
         event: "Liked your post",
         toWho: thePost.owner,
         fromWho: theUser._id,
-        relatedTo: thePost._id,
+        imageTo: postId,
         seen: false
        })
        notification.save()
@@ -165,7 +165,18 @@ try{
       }
     }
   } )
-  .then(newComment => {
+  .then(postUpdated => {
+
+    const notification = new Notifications({
+      type: "Comment",
+      event: "commented your post",
+      toWho: postUpdated.owner,
+      fromWho: owner._id,
+      imageTo: id,
+      seen: false
+     })
+     notification.save()
+     
     res.json(newComment)
   }).catch(err => console.log(err))
 

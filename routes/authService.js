@@ -18,7 +18,7 @@ const uploader = require('../configs/cloudinary-setup');
 router.get('/getNotifications/:id', (req, res, next) => {
   console.log(req.params.id)
   const {id} = req.params
-  Notifications.find({toWho: id}).populate('fromWho', '_id username imageUrl').populate('toWho', '_id username imageUrl')
+  Notifications.find({toWho: id}).populate('fromWho', '_id username imageUrl').populate('toWho', '_id username imageUrl').populate('imageTo')
   .then(theNotifications => {
     res.status(200).json(theNotifications)
   }).catch(err => console.log(err))
@@ -145,7 +145,7 @@ router.post('/follow/:id', (req, res, next) => {
     event: "Started following you",
     toWho: userToFollowId,
     fromWho: userId,
-    relatedTo: userId,
+    imageTo: null,
     seen: false
    })
 

@@ -11,7 +11,8 @@ const notificationSchema = new Schema({
     type: Boolean,
     default: false
   },
-  relatedTo: Schema.Types.Mixed
+  imageTo: {type: Schema.Types.ObjectId, ref: 'Post'}
+
 }, {
   timestamps: true
 })
