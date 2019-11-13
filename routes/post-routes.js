@@ -10,6 +10,7 @@ const uploader = require('../configs/cloudinary-setup');
 
 postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) => {
   // console.log(req.body)
+  // currently getting the locations
   const { caption, imagePost, tags } = req.body
   console.log(req.body)
   let tagsArray = tags.split(/[.,\/ -#]/)
@@ -28,7 +29,7 @@ postroutes.post('/createNewPost', uploader.single("imageUrl"), (req, res, next) 
     .catch(err => console.log(err))
 })
 
-
+// hello this is a commment
 
 postroutes.get('/createNewPost', (req, res, next) => {
   try {
